@@ -1,4 +1,4 @@
-__pycache__/
-*.pyc
 .env
-class_materials/
+/data/
+.ipynb_checkpoints/
+__pycache__/
