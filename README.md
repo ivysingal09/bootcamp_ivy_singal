@@ -27,6 +27,26 @@ The aim is to end up with a small data-driven tool that helps in making investme
 **Assumptions/Constraints:** Public data; daily cadence; keep secrets out of repo.  
 **Risks:** API limits, data quality, sentiment noise.  
 **Lifecycle → Deliverables:**  
+
+## Stakeholder & User
+Individual investor doing a quick daily pre-market check. The output fits into a “morning routine” before placing trades.
+
+## Useful Answer & Decision
+Descriptive summary (returns, volume, moving averages) + a simple predictive cue (e.g., SMA crossover). Artifact = a reproducible notebook/report.
+
+## Assumptions & Constraints
+- Public data sources only; no keys in repo
+- Daily cadence; load time < 5s
+- Keep outputs simple and readable
+
+## Known Unknowns / Risks
+- Data gaps or API limits
+- Location/timezone quirks in market calendars
+- Noisy sentiment signals
+
+## Repo Plan
+Folders: `/data/`, `/src/`, `/notebooks/`, `/docs/`.  
+Commits as stages progress; README updated each stage.
 - Stage 0 → env/repo (done)  
 - Stage 1 → scoping + stakeholder memo (this HW)  
 - Stage 2 → tooling (`.env`, `src/config.py`)  
