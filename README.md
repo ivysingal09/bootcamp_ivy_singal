@@ -1,13 +1,13 @@
 # Bootcamp Repository
 
 ## Folder Structure
-- **homework/** → All homework contributions will be submitted here.
-- **project/** → All project contributions will be submitted here.
-- **class_materials/** → Local storage for class materials. Never pushed to GitHub.
+- **homework/** → All homework contributions go here.
+- **project/** → All project contributions go here.
+- **class_materials/** → Local files only, not pushed to GitHub.
 
-## Homework Folder Rules
-- Each homework will be in its own subfolder (e.g., homework0, homework1, ...).
-- Include all required files for grading.
+## Homework Rules
+- Each homework must be in its own folder (homework0, homework1, ...).
+- Include all required files.
 
-## Project Folder Rules
-- Keep project files organized and clearly named.
+## Project Rules
+- Keep files organized and clearly named.

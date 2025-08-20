@@ -1,4 +1,4 @@
-class_materials/
 __pycache__/
 *.pyc
 .env
+class_materials/
