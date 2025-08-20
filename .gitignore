@@ -1,6 +1,4 @@
-code .gitignore/data/*
-!/data/.gitkeep
-!/data/raw/.gitkeep# Ignore environment variables
+# Ignore environment variables
 .env
 
 # Ignore everything in data but keep .gitkeep files
@@ -9,9 +7,5 @@ code .gitignore/data/*
 !/data/raw/.gitkeep
 
 # Ignore Jupyter checkpoints and Python cache
-.ipynb_checkpoints/
-__pycache__/
-.env
-/data/
 .ipynb_checkpoints/
 __pycache__/
