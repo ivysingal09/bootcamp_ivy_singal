@@ -12,43 +12,34 @@
 ## Project Rules
 - Keep files organized and clearly named.
 
-## Project Scoping
-For this project I am looking at financial market data. The idea is to see how factors like interest rates, inflation, and stock indices might affect market movements.  
+# Bootcamp Homework – Ivy Singal  
 
-The stakeholder I am thinking of is an individual investor who just wants to make smarter choices. The answer I want to give is partly descriptive (summarizing past patterns) and partly predictive (to say something about possible future outcomes).  
+This repository contains my homework submissions for the Bootcamp.  
+It is structured to keep code, data, notebooks, and reports organized.
 
-The aim is to end up with a small data-driven tool that helps in making investment decisions with more confidence.
+---
 
-## Project Scoping (Stage 1)
+## 📂 Repository Layout  
+- **/data** – Datasets used in assignments (raw/processed).  
+- **/src** – Source code and helper scripts.  
+- **/notebooks** – Drafts and exploration notebooks.  
+- **/homework** – Final homework submissions (by stage).  
 
-**Problem:** Summarize financial market conditions and simple signals so an individual investor can make quick, informed decisions.  
-**Stakeholder/User:** Individual investor (daily pre-market check).  
-**Useful Answer:** Descriptive + simple predictive cues; small dashboard/notebook with metrics and plots.  
-**Assumptions/Constraints:** Public data; daily cadence; keep secrets out of repo.  
-**Risks:** API limits, data quality, sentiment noise.  
-**Lifecycle → Deliverables:**  
+---
 
-## Stakeholder & User
-Individual investor doing a quick daily pre-market check. The output fits into a “morning routine” before placing trades.
+## Homework 1 – Stage 1: Problem Framing & Scoping  
 
-## Useful Answer & Decision
-Descriptive summary (returns, volume, moving averages) + a simple predictive cue (e.g., SMA crossover). Artifact = a reproducible notebook/report.
+### Problem Statement  
+Credit risk assessment remains one of the most critical challenges in financial services. Traditional models depend mainly on bureau data and repayment history, which disadvantages borrowers with limited or no credit history. This project explores a more inclusive credit risk modeling framework that combines traditional signals with alternative data sources (e.g., transaction behavior, employment stability, digital footprints) to improve prediction accuracy, fairness, and financial inclusion.  
 
-## Assumptions & Constraints
-- Public data sources only; no keys in repo
-- Daily cadence; load time < 5s
-- Keep outputs simple and readable
+### Scope of Work  
+- Identify limitations of existing credit risk assessment approaches.  
+- Propose data sources (traditional + alternative) and justify their relevance.  
+- Outline potential modeling approaches (machine learning, interpretable models).  
+- Consider fairness, ethical, and regulatory aspects in evaluation.  
+- Define clear success criteria: accuracy, fairness, and robustness.  
 
-## Known Unknowns / Risks
-- Data gaps or API limits
-- Location/timezone quirks in market calendars
-- Noisy sentiment signals
-
-## Repo Plan
-Folders: `/data/`, `/src/`, `/notebooks/`, `/docs/`.  
-Commits as stages progress; README updated each stage.
-- Stage 0 → env/repo (done)  
-- Stage 1 → scoping + stakeholder memo (this HW)  
-- Stage 2 → tooling (`.env`, `src/config.py`)  
-- Stage 3 → fundamentals (`src/utils.py`, pandas/NumPy demo)  
-- Stage 4 → ingestion pipeline (API/scrape to `/data/raw`)
+### Expected Outcomes  
+- More accurate credit default prediction compared to baseline bureau-only models.  
+- Expanded access to credit for underserved or “thin-file” borrowers.  
+- Framework aligned with ethical and regulatory standards.  
