@@ -9,3 +9,5 @@
 # Ignore Jupyter checkpoints and Python cache
 .ipynb_checkpoints/
 __pycache__/
+!/data/processed/
+!/data/processed/**
