@@ -43,3 +43,14 @@ Credit risk assessment remains one of the most critical challenges in financial 
 - More accurate credit default prediction compared to baseline bureau-only models.  
 - Expanded access to credit for underserved or “thin-file” borrowers.  
 - Framework aligned with ethical and regulatory standards.  
+
+## Stage 5: Data Storage Homework
+
+This stage demonstrates the ability to save and load tabular data using different file formats and environment-based folder configuration:
+
+- Created environment variables for raw and processed data directories (`.env`)
+- Saved a sample DataFrame to:
+  - **CSV**: `data/raw/example.csv`
+  - **Parquet**: `data/processed/example.parquet`
+- Verified both files by reading them back into pandas and comparing (same shape and content)
+
