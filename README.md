@@ -54,3 +54,32 @@ This stage demonstrates the ability to save and load tabular data using differen
   - **Parquet**: `data/processed/example.parquet`
 - Verified both files by reading them back into pandas and comparing (same shape and content)
 
+
+## Stage 05 – Data Storage
+
+For this stage, I worked with environment-driven paths (`DATA_DIR_RAW`, `DATA_DIR_PROCESSED`) to save and reload data in multiple formats.
+
+### Files Created
+- `data/raw/example.csv`
+- `data/raw/example.csv.gz`
+- `data/processed/example.parquet`
+- `data/processed/example.snappy.parquet`
+
+### Validation
+Both CSV and Parquet were reloaded successfully and the data matched exactly (`Alice`, `Bob`, `Charlie`).
+
+### File Sizes (KB)
+- CSV: **0.03**
+- CSV (gzip): **0.07**
+- Parquet: **1.62**
+- Parquet (snappy): **1.62**
+
+### Observations
+- For very small datasets, CSV may look smaller because Parquet carries schema + metadata overhead.  
+- On larger datasets, **Parquet is typically smaller and much faster** for analytics because of its binary, columnar format and built-in compression.  
+- CSV is human-readable and simple to share, but inefficient for storage and queries.  
+- Parquet is not human-readable, but it is the better choice for scalable storage and analytical workloads.
+
+**Conclusion:**  
+Use **CSV** for small / human-readable cases.  
+Use **Parquet** for efficient, large-scale data storage and analytics.
