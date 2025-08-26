@@ -73,3 +73,16 @@ Both CSV and Parquet were reloaded successfully and the data matched exactly (`A
 Use **CSV** for small / human-readable cases.  
 Use **Parquet** for efficient, large-scale data storage and analytics.
 ## Stage 5 – Data Storage
+
+## Stage 6 – Data Preprocessing
+
+This stage covers data cleaning and normalization using helper functions in [src/cleaning.py](src/cleaning.py).
+
+- 📓 Notebook: [stage06_data-preprocessing_homework-starter.ipynb](notebooks/stage06_data-preprocessing_homework-starter.ipynb)  
+- 🧹 Functions: [cleaning.py](src/cleaning.py)  
+- 📂 Processed Dataset: [sample_data_cleaned.csv](data/processed/sample_data_cleaned.csv)  
+
+Steps performed:
+1. Filled missing values with column medians  
+2. Dropped columns/rows with too many missing values  
+3. Normalized numeric columns to [0,1]  
