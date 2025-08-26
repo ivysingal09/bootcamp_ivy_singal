@@ -49,7 +49,6 @@ For this stage, I worked with environment-driven paths (`DATA_DIR_RAW`, `DATA_DI
 
 ### Files Created
 
-### Files Created
 - `data/raw/example.csv`
 - `data/raw/example.csv.gz`
 - `data/processed/example.parquet`
@@ -73,3 +72,4 @@ Both CSV and Parquet were reloaded successfully and the data matched exactly (`A
 **Conclusion:**  
 Use **CSV** for small / human-readable cases.  
 Use **Parquet** for efficient, large-scale data storage and analytics.
+## Stage 5 – Data Storage
