@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify
-
 app = Flask(__name__)
-
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"ok": True})
@@ -15,7 +13,6 @@ def predict():
     # TODO: load your pickled model and compute prediction
     # placeholder: sum of features
     return jsonify({"prediction": sum(feats)})
-
 if __name__ == "__main__":
     # Local run:  python api/app.py
     app.run(host="0.0.0.0", port=5000, debug=True)
