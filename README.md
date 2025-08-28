@@ -72,3 +72,10 @@ Both CSV and Parquet were reloaded successfully and the data matched exactly (`A
 **Conclusion:**  
 Use **CSV** for small / human-readable cases.  
 Use **Parquet** for efficient, large-scale data storage and analytics.
+
+## Stage 13 Productization
+- API at `api/app.py`
+- Model artifacts in `model/`
+- Reusable code in `src/`
+- Reports in `reports/`
+- Deliverables in `deliverables/`
