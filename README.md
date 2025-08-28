@@ -11,6 +11,7 @@
 
 ## Project Rules
 - Keep files organized and clearly named.
+<<<<<<< HEAD
 
 # Bootcamp Homework – Ivy Singal  
 
@@ -86,3 +87,5 @@ Use **Parquet** for efficient, large-scale data storage and analytics.
 - Reusable code in `src/`
 - Reports in `reports/`
 - Deliverables in `deliverables/`
+=======
+>>>>>>> origin/main
