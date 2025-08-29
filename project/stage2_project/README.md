@@ -14,4 +14,4 @@
 - **docs/** → for reports, figures, or documentation  
 
 ## Notes
-This setup ensures all team members use the same structure and tools. Data is separated into raw vs. processed, notebooks are for analysis steps, and reusable code lives in `src/`.  
+Data is separated into raw vs. processed, notebooks are for analysis steps, and reusable code lives in `src/`.  
