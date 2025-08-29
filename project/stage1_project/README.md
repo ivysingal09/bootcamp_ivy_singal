@@ -12,6 +12,3 @@ The first version will explore price trends by location, property size, and time
 **Decisions they’ll make with this:**  
 - Where and when to buy properties  
 - How much to budget or bid based on expected price direction
-
----
-(Required items only; aligned to Stage 1 instructions.)
