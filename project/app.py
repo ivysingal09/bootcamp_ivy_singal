@@ -1,138 +1,94 @@
 # project/app.py
-import os
 from pathlib import Path
+import os
 import pandas as pd
 from flask import Flask, request, jsonify
 import joblib
 
 # -----------------------------
-# Paths (robust & simple)
+# Paths (simple & robust)
 # -----------------------------
-# Base dir = repo root (parent of project/)
-BASE_DIR = Path(__file__).resolve().parent.parent  
+BASE_DIR = Path(__file__).resolve().parent  # .../bootcamp_ivy_singal/project
+MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "model" / "rf_time_pipeline_stage10b.joblib"))
 
-FEAT_PATH = BASE_DIR / "project" / "data" / "processed" / "IYR_features_project.csv"
-MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "project" / "model" / "rf_time_pipeline_stage10b.joblib"))
+# Optional: if present, we can use it for "predict_last", but NOT required to run
+FEAT_PATH = Path(os.getenv("FEAT_PATH", BASE_DIR / "data" / "processed" / "IYR_features_project.csv"))
+
 # -----------------------------
-# Load data & model (fail fast)
+# Load model (required)
 # -----------------------------
-if not FEAT_PATH.exists():
-    raise FileNotFoundError(f"Features file not found at {FEAT_PATH}")
 if not MODEL_PATH.exists():
-    raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
-
-df = pd.read_csv(FEAT_PATH)
+    raise FileNotFoundError(f"Model file not found at: {MODEL_PATH}")
 model = joblib.load(str(MODEL_PATH))
 
-# Determine feature columns expected by the model.
-# Prefer model.feature_names_in_ when available (scikit-learn >=1.0); otherwise, infer by dropping common non-feature columns.
+# Determine feature columns expected by the model (if available)
+FEATURE_COLS = None
 if hasattr(model, "feature_names_in_"):
     FEATURE_COLS = list(model.feature_names_in_)
-else:
-    NON_FEATURE = {"Date", "date", "y", "y_actual", "y_pred", "target",
-                   "Close", "Adj Close", "Open", "High", "Low", "Volume"}
-    FEATURE_COLS = [c for c in df.columns if c not in NON_FEATURE]
 
-# Keep only columns that actually exist in df (in case the model was trained on a subset)
-FEATURE_COLS = [c for c in FEATURE_COLS if c in df.columns]
-
+# -----------------------------
+# App
+# -----------------------------
 app = Flask(__name__)
 
-# -----------------------------
-# Helpers
-# -----------------------------
-def _ensure_frame(payload: dict | None) -> pd.DataFrame:
-    """
-    Accepts JSON payload in either of these shapes:
-      1) {"features": {"ma_7": ..., "vol_21": ..., ...}}
-      2) {"row": {"ma_7": ..., "vol_21": ..., ...}}
-      3) If payload is None or empty, fall back to the *last* row of df.
-    Returns a 1-row DataFrame with FEATURE_COLS.
-    """
-    if payload and isinstance(payload, dict):
-        row = payload.get("features") or payload.get("row")
-        if isinstance(row, dict):
-            X = pd.DataFrame([row])
-        else:
-            # user passed something else; ignore and use last row
-            X = df.tail(1).copy()
-    else:
-        X = df.tail(1).copy()
-
-    # Restrict to feature columns; if a column is missing in payload, fill with NaN (your pipeline can impute)
-    for col in FEATURE_COLS:
-        if col not in X.columns:
-            X[col] = pd.NA
-
-    # Order columns for the model
-    X = X[FEATURE_COLS]
-    return X
-
-# -----------------------------
-# Routes
-# -----------------------------
 @app.get("/health")
 def health():
     return jsonify({
         "status": "ok",
         "model_path": str(MODEL_PATH),
-        "features_path": str(FEAT_PATH),
-        "n_rows_available": int(len(df)),
-        "n_feature_cols": len(FEATURE_COLS),
-        "feature_sample": FEATURE_COLS[:10],
+        "features_expected": FEATURE_COLS if FEATURE_COLS is not None else "infer from payload",
+        "features_csv_available": FEAT_PATH.exists(),
     })
+
+def _payload_to_frame(payload: dict) -> pd.DataFrame:
+    """
+    Accepts JSON payload:
+        {"features": {"ma_7": ..., "vol_21": ..., ...}}
+      or just a flat dict of features.
+
+    Returns a 1-row DataFrame aligned to FEATURE_COLS if known,
+    else uses all provided keys as columns.
+    """
+    if payload is None:
+        payload = {}
+    # allow {"features": {...}} or flat dict
+    feats = payload.get("features", payload if isinstance(payload, dict) else {})
+
+    if not isinstance(feats, dict) or len(feats) == 0:
+        raise ValueError('Provide JSON like {"features": {"col": value, ...}}.')
+
+    X = pd.DataFrame([feats])
+
+    # If model knows its feature names, align to that order and fill missing with 0
+    if FEATURE_COLS is not None:
+        for col in FEATURE_COLS:
+            if col not in X.columns:
+                X[col] = 0
+        X = X[FEATURE_COLS]
+    else:
+        # otherwise, use whatever numeric columns were provided
+        X = X.select_dtypes(include="number")
+        if X.shape[1] == 0:
+            raise ValueError("No numeric feature columns found in payload.")
+
+    # Basic fill for any remaining missing
+    X = X.fillna(0)
+    return X
 
 @app.post("/predict")
 def predict():
-    """
-    POST JSON examples:
-
-    - Use latest row:
-        {}
-
-    - Provide a full/partial feature dict:
-        {
-          "features": {
-            "ma_7": 0.12, "ma_21": 0.10, "vol_21": 0.008, ...
-          }
-        }
-    """
-    payload = request.get_json(silent=True)
-    X = _ensure_frame(payload)
-
     try:
-        y_pred = model.predict(X)[0]
+        payload = request.get_json(silent=True)
+        X = _payload_to_frame(payload)
+        y_hat = float(model.predict(X)[0])
+        return jsonify({"prediction": y_hat, "n_features_used": X.shape[1]})
     except Exception as e:
-        return jsonify({"error": f"Prediction failed: {repr(e)}"}), 400
+        return jsonify({"error": str(e)}), 400
 
-    return jsonify({
-        "prediction": float(y_pred),
-        "used_features": FEATURE_COLS,
-        "n_features": len(FEATURE_COLS),
-    })
-
-@app.get("/predict_last")
-def predict_last():
-    X = df.tail(1)[FEATURE_COLS]
-    try:
-        y_pred = model.predict(X)[0]
-    except Exception as e:
-        return jsonify({"error": f"Prediction failed: {repr(e)}"}), 400
-
-    return jsonify({
-        "prediction": float(y_pred),
-        "row_index": int(df.index[-1]),
-        "n_features": len(FEATURE_COLS),
-    })
-
-# -----------------------------
-# Entrypoint
-# -----------------------------
 if __name__ == "__main__":
     # Helpful startup prints
-    print("BASE_DIR  :", BASE_DIR)
-    print("FEAT_PATH :", FEAT_PATH, "exists?", FEAT_PATH.exists())
-    print("MODEL_PATH:", MODEL_PATH, "exists?", MODEL_PATH.exists())
-    print("n_rows    :", len(df))
-    print("n_features:", len(FEATURE_COLS))
+    print("BASE_DIR :", BASE_DIR)
+    print("MODEL    :", MODEL_PATH, "exists?", MODEL_PATH.exists())
+    print("FEAT_CSV :", FEAT_PATH, "exists?", FEAT_PATH.exists())
+    print("FEATURES :", FEATURE_COLS if FEATURE_COLS is not None else "infer from payload")
     app.run(host="127.0.0.1", port=5000, debug=True)
