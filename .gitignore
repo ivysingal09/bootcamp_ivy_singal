@@ -13,3 +13,6 @@ __pycache__/
 !/data/processed/**
 !/data/raw/
 !/data/raw/**
+
+# local backups
+project/app.backup*
