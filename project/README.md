@@ -21,10 +21,15 @@ From the cleaned dataset (IYR_cleaned_project.csv), we created new features to c
 
 Features added:
 Lagged returns: ret_lag1, ret_lag5
+
 Moving averages (MA): ma_7, ma_21, ma_63, ma_126
+
 Rolling volatility: vol_7, vol_21, vol_63
+
 Momentum: mom_10, mom_20, mom_60
+
 Cumulative return: cum_return
+
 Technical indicators: ema_12, ema_26, rsi_14
 
 Output saved as:
