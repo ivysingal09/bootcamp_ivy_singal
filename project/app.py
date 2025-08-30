@@ -8,10 +8,11 @@ import joblib
 # -----------------------------
 # Paths (robust & simple)
 # -----------------------------
-BASE_DIR = Path(__file__).resolve().parent                      # .../bootcamp_ivy_singal/project
-FEAT_PATH = BASE_DIR / "data" / "processed" / "IYR_features_project.csv"
-MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "model" / "rf_time_pipeline_stage10b.joblib"))
+# Base dir = repo root (parent of project/)
+BASE_DIR = Path(__file__).resolve().parent.parent  
 
+FEAT_PATH = BASE_DIR / "project" / "data" / "processed" / "IYR_features_project.csv"
+MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "project" / "model" / "rf_time_pipeline_stage10b.joblib"))
 # -----------------------------
 # Load data & model (fail fast)
 # -----------------------------
