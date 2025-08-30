@@ -16,21 +16,17 @@ This project explores real estate price trends to support better investment deci
 - **data/processed/** → cleaned or transformed datasets (e.g., `house_prices_processed_project.csv`)
 - All code should load data using paths from the `.env` file (e.g., `os.getenv("DATA_DIR")`).
 
-## Feature Engineering
-From the cleaned dataset (IYR_cleaned_project.csv), we created new features to capture trends, volatility, and momentum in real estate ETF data.
+## Feature Engineering  
 
-Features added:
-Lagged returns: ret_lag1, ret_lag5
+From the cleaned dataset (`IYR_cleaned_project.csv`), we created new features to capture **trends, volatility, and momentum** in real estate ETF data.  
 
-Moving averages (MA): ma_7, ma_21, ma_63, ma_126
+**Features added:**  
+- **Lagged returns**: `ret_lag1`, `ret_lag5`  
+- **Moving averages (MA)**: `ma_7`, `ma_21`, `ma_63`, `ma_126`  
+- **Rolling volatility**: `vol_7`, `vol_21`, `vol_63`  
+- **Momentum**: `mom_10`, `mom_20`, `mom_60`  
+- **Cumulative return**: `cum_return`  
+- **Technical indicators**: `ema_12`, `ema_26`, `rsi_14`  
 
-Rolling volatility: vol_7, vol_21, vol_63
-
-Momentum: mom_10, mom_20, mom_60
-
-Cumulative return: cum_return
-
-Technical indicators: ema_12, ema_26, rsi_14
-
-Output saved as:
-project/data/processed/IYR_features_project.csv
+**Output saved as**:  
+`project/data/processed/IYR_features_project.csv`
