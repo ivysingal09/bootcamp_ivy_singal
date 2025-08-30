@@ -1,19 +1,21 @@
-import os
 from pathlib import Path
-import json
-import pandas as pd
-import numpy as np
-from flask import Flask, request, jsonify
-import joblib
+import os
 
-# Base directory = the folder where app.py lives
+# Folder where THIS file (app.py) lives:  .../bootcamp_ivy_singal/project
 BASE_DIR = Path(__file__).resolve().parent
 
-# Robust paths (no double "project/")
+# Correct absolute paths (no extra "project" anywhere)
 FEAT_PATH = BASE_DIR / "data" / "processed" / "IYR_features_project.csv"
-MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "model" / "rf_time_pipeline_stage10b.joblib"))
+MODEL_PATH = Path(os.getenv("MODEL_PATH", str(BASE_DIR / "model" / "rf_time_pipeline_stage10b.joblib")))
 
-# Safety checks
+# Debug prints so you can see exactly what it's using
+print("BASE_DIR  :", BASE_DIR)
+print("FEAT_PATH :", FEAT_PATH)
+print("MODEL_PATH:", MODEL_PATH)
+print("Feature file exists? ", FEAT_PATH.exists())
+print("Model file exists?   ", MODEL_PATH.exists())
+
+# Fail fast if something's missing
 if not FEAT_PATH.exists():
     raise FileNotFoundError(f"Features file not found at {FEAT_PATH}")
 if not MODEL_PATH.exists():
