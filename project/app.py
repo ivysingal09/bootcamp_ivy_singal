@@ -6,18 +6,14 @@ import numpy as np
 from flask import Flask, request, jsonify
 import joblib
 
-# --- Paths ---
-from pathlib import Path
-import os
-
 # Base directory = the folder where app.py lives
 BASE_DIR = Path(__file__).resolve().parent
 
-# Paths to data and model (robust, no double "project/")
+# Robust paths (no double "project/")
 FEAT_PATH = BASE_DIR / "data" / "processed" / "IYR_features_project.csv"
 MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "model" / "rf_time_pipeline_stage10b.joblib"))
 
-# Safety check
+# Safety checks
 if not FEAT_PATH.exists():
     raise FileNotFoundError(f"Features file not found at {FEAT_PATH}")
 if not MODEL_PATH.exists():
