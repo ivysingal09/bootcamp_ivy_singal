@@ -17,8 +17,7 @@ This project explores real estate price trends to support better investment deci
 - All code should load data using paths from the `.env` file (e.g., `os.getenv("DATA_DIR")`).
 
 ## Feature Engineering  
-
-From the cleaned dataset (`IYR_cleaned_project.csv`), we created new features to capture **trends, volatility, and momentum** in real estate ETF data.  
+From the cleaned dataset (`IYR_cleaned_project.csv`), I created new features to capture **trends, volatility, and momentum** in real estate ETF data.  
 
 **Features added:**  
 - **Lagged returns**: `ret_lag1`, `ret_lag5`  
@@ -29,4 +28,12 @@ From the cleaned dataset (`IYR_cleaned_project.csv`), we created new features to
 - **Technical indicators**: `ema_12`, `ema_26`, `rsi_14`  
 
 **Output saved as**:  
-`project/data/processed/IYR_features_project.csv`
+project/data/processed/IYR_features_project.csv
+
+## Productization (Flask API)
+I built a Flask API to serve my trained model (`rf_time_pipeline_stage10b.joblib`).
+
+### How to Run
+```bash
+# From repo root
+python project/app.py
