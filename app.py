@@ -1,66 +1,80 @@
-import os, io, pickle
-from typing import List, Any
-from flask import Flask, request, jsonify, Response
+import os
+from pathlib import Path
+import json
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from src.utils import validate_numeric_list
+from flask import Flask, request, jsonify
+import joblib
 
-MODEL_PATH = os.getenv("MODEL_PATH", "model/model.pkl")
+# --- Paths ---
+BASE = Path(__file__).resolve().parent
+MODEL_PATH = BASE / "project" / "model" / "rf_time_pipeline_stage10b.joblib"
+FEAT_PATH  = BASE / "project" / "data" / "processed" / "IYR_features_project.csv"
+
 app = Flask(__name__)
 
-def _load_model():
-    if os.path.exists(MODEL_PATH):
-        with open(MODEL_PATH, "rb") as f:
-            return pickle.load(f)
-    return None
+# --- Load model once ---
+if not MODEL_PATH.exists():
+    raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
+model = joblib.load(MODEL_PATH)
 
-model = _load_model()
+# Infer feature columns from the training/features file
+if not FEAT_PATH.exists():
+    raise FileNotFoundError(f"Features file not found at {FEAT_PATH}")
+df_train = pd.read_csv(FEAT_PATH)
+# columns used in Stage 10b (all except Date and the target we created there)
+feature_cols = [c for c in df_train.columns if c not in ["Date", "target_close_t1"]]
 
-def _predict_with_fallback(features: List[float]) -> Any:
-    arr = np.array(features, dtype=float).reshape(1, -1)
-    if model is not None and hasattr(model, "predict"):
-        try:
-            y = model.predict(arr)
-            return y.tolist()[0] if hasattr(y, "tolist") else y
-        except Exception:
-            pass
-    return float(np.sum(arr))
+def _coerce_dataframe(d):
+    """Coerce incoming dict to a single-row DataFrame with correct column order."""
+    x = pd.DataFrame([d])
+    # add any missing columns with NaN
+    for col in feature_cols:
+        if col not in x.columns:
+            x[col] = np.nan
+    # restrict to known features in correct order
+    x = x[feature_cols]
+    # simple impute NaNs with previous day mean if available (fallback: 0)
+    x = x.fillna(x.mean(numeric_only=True)).fillna(0)
+    return x
 
-@app.route("/health")
+@app.get("/health")
 def health():
-    return jsonify({"status": "ok", "model_loaded": model is not None})
+    return jsonify({
+        "status": "ok",
+        "model_loaded": True,
+        "n_features": len(feature_cols)
+    })
 
-@app.route("/predict", methods=["POST"])
+@app.post("/predict")
 def predict():
-    if not request.is_json:
-        return jsonify({"error": "Content-Type must be application/json"}), 415
+    """
+    JSON body: { "features": { "<col1>": value, "<col2>": value, ... } }
+    Returns: { "prediction": float, "n_features": int }
+    """
     data = request.get_json(silent=True) or {}
-    if "X" in data:
-        preds = [_predict_with_fallback(validate_numeric_list(row)) for row in data["X"]]
-        return jsonify({"predictions": preds})
-    features = data.get("features")
-    if features is None:
-        return jsonify({"error": "Missing 'features'"}), 400
-    feats = validate_numeric_list(features)
-    return jsonify({"prediction": _predict_with_fallback(feats)})
+    feats = data.get("features", {})
+    if not isinstance(feats, dict) or len(feats) == 0:
+        return jsonify({"error": "Provide JSON like {\"features\": {\"col\": val, ...}}"}), 400
+    x = _coerce_dataframe(feats)
+    y_hat = float(model.predict(x)[0])
+    return jsonify({"prediction": y_hat, "n_features": len(feature_cols)})
 
-@app.route("/predict/<float:input1>")
-def predict_one(input1: float):
-    return jsonify({"prediction": _predict_with_fallback([input1])})
-
-@app.route("/predict/<float:input1>/<float:input2>")
-def predict_two(input1: float, input2: float):
-    return jsonify({"prediction": _predict_with_fallback([input1, input2])})
-
-@app.route("/plot")
-def plot():
-    fig, ax = plt.subplots()
-    ax.plot([0,1,2,3,4], [x*x for x in range(5)])
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png")
-    plt.close(fig)
-    buf.seek(0)
-    return Response(buf.read(), mimetype="image/png")
+@app.get("/predict_from_latest")
+def predict_from_latest():
+    """
+    Convenience endpoint: take the last row of IYR_features_project.csv and predict next-day Close.
+    """
+    df = pd.read_csv(FEAT_PATH).sort_values("Date")
+    x = df.iloc[[-1]][feature_cols]  # last row, only feature columns
+    x = x.fillna(x.mean(numeric_only=True)).fillna(0)
+    y_hat = float(model.predict(x)[0])
+    return jsonify({
+        "date_used": str(df["Date"].iloc[-1]) if "Date" in df.columns else None,
+        "prediction": y_hat,
+        "n_features": len(feature_cols)
+    })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # For local dev only. Use a production server (gunicorn) to deploy.
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)), debug=False)
